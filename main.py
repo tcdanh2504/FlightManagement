@@ -8,7 +8,7 @@ class MainWindow(tk.Frame):
         title.pack()
         
         flight_window = FlightWindow(self.show)
-        flight_button = tk.Button(self, text=f"Flight", command=lambda: [self.pack_forget(), flight_window.pack(fill=tk.BOTH), flight_window.start()])
+        flight_button = tk.Button(self, text=f"Flight", command=lambda: [self.pack_forget(), flight_window.pack(fill=tk.BOTH, expand=True), flight_window.start()])
         flight_button.pack()
         
         customer_button = tk.Button(self, text=f"Customer")
@@ -25,5 +25,5 @@ class MainWindow(tk.Frame):
 root = tk.Tk()
 root.geometry("800x600")
 main_window = MainWindow(root)
-main_window.pack(fill=tk.BOTH)
+main_window.pack(fill=tk.BOTH, expand=True)
 main_window.start()   
