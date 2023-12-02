@@ -1,12 +1,13 @@
 import pandas as pd
 from typing import List
 from models.flight import Flight
+from utils.result import Result
 
 class FlightController:
     def __init__(self):
         self.csv_file = "data/flights.csv"
 
-    def append_flight(self, flight: Flight) -> None:
+    def append_flight(self, flight: Flight) -> Result:
         # Create a DataFrame from the flight object's attributes
         flight_df = pd.DataFrame([vars(flight)])
         is_file_exist = True
@@ -21,13 +22,14 @@ class FlightController:
 
         # Check if the flight ID already exists
         if is_file_exist and df['flight_id'].isin([flight.flight_id]).any():
-            print(f"Flight ID {flight.flight_id} already exists.")
+            return Result(error=f"Flight ID {flight.flight_id} already exists.")
         else:
             # Append the new flight data
             df = df.append(flight_df, ignore_index=True)
 
             # Write the DataFrame back to the CSV file
             df.to_csv(self.csv_file, index=False)
+            return Result(data="Flight added successfully.")
 
     def read_flights(self) -> List[Flight]:
         try:
@@ -43,35 +45,34 @@ class FlightController:
 
         return flights
     
-    def remove_flight(self, flight_id: str) -> None:
+    def remove_flight(self, flight_id: str) -> Result:
         # Try to read the existing CSV file
         try:
             df = pd.read_csv(self.csv_file)
         except FileNotFoundError:
-            print("File not found.")
-            return
+            return Result(error="File not found.")
 
         # Check if the flight ID exists
         if not df['flight_id'].isin([flight_id]).any():
-            print(f"Flight ID {flight_id} does not exist.")
+            return Result(error=f"Flight ID {flight_id} does not exist.")
         else:
             # Remove the flight with the given ID
             df = df[df.flight_id != flight_id]
 
             # Write the DataFrame back to the CSV file
             df.to_csv(self.csv_file, index=False)
-            
-    def edit_flight(self, flight: Flight) -> None:
+            return Result(data="Flight removed successfully.")
+
+    def edit_flight(self, flight: Flight) -> Result:
         # Try to read the existing CSV file
         try:
             df = pd.read_csv(self.csv_file)
         except FileNotFoundError:
-            print("File not found.")
-            return
+            return Result(error="File not found.")
 
         # Check if the flight ID exists
         if not df['flight_id'].isin([flight.flight_id]).any():
-            print(f"Flight ID {flight.flight_id} does not exist.")
+            return Result(error=f"Flight ID {flight.flight_id} does not exist.")
         else:
             # Find the index of the flight with the given ID
             index = df[df['flight_id'] == flight.flight_id].index[0]
@@ -83,3 +84,4 @@ class FlightController:
 
             # Write the DataFrame back to the CSV file
             df.to_csv(self.csv_file, index=False)
+            return Result(data="Flight edited successfully.")

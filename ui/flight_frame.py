@@ -3,6 +3,7 @@ from tkinter import ttk, messagebox
 from controllers.fightController import FlightController
 from models.flight import Flight
 from datetime import datetime
+from utils.result import Result
 
 class FlightWindow(tk.Frame):
     
@@ -93,16 +94,16 @@ class FlightWindow(tk.Frame):
         # Create a button that creates the Flight object and appends it to the CSV file
         def submit():
             flight_id, departure, destination, departure_time, arrival_time, seats, available_seats, airline, flight_status, price, aircraft_type = [entry.get() for entry in entries]
-            departure_time = datetime.strptime(departure_time, "%Y-%m-%d %H:%M:%S.%f")
-            arrival_time = datetime.strptime(arrival_time, "%Y-%m-%d %H:%M:%S.%f")
+            departure_time = datetime.strptime(departure_time, "%Y-%m-%d %H:%M:%S")
+            arrival_time = datetime.strptime(arrival_time, "%Y-%m-%d %H:%M:%S")
             seats = int(seats)
             available_seats = int(available_seats)
             price = float(price)
             new_flight = Flight(flight_id, departure, destination, departure_time, arrival_time, seats, available_seats, airline, flight_status, price, aircraft_type)
             if flight is None:
-                self.controller.append_flight(new_flight)
+                self.handle_state(self.controller.append_flight(new_flight))
             else:
-                self.controller.edit_flight(new_flight)
+                self.handle_state(self.controller.edit_flight(new_flight))
             self.load_data_from_file()
             window.destroy()
 
@@ -115,8 +116,8 @@ class FlightWindow(tk.Frame):
         if len(item_values) == 0:
             return
         flight_id, departure, destination, departure_time, arrival_time, seats, available_seats, airline, flight_status, price, aircraft_type = item_values
-        departure_time = datetime.strptime(departure_time, "%Y-%m-%d %H:%M:%S.%f")
-        arrival_time = datetime.strptime(arrival_time, "%Y-%m-%d %H:%M:%S.%f")
+        departure_time = datetime.strptime(departure_time, "%Y-%m-%d %H:%M:%S")
+        arrival_time = datetime.strptime(arrival_time, "%Y-%m-%d %H:%M:%S")
         seats = int(seats)
         available_seats = int(available_seats)
         price = float(price)
@@ -132,8 +133,12 @@ class FlightWindow(tk.Frame):
         result = messagebox.askquestion("Delete", "Are you sure you want to delete this item?", icon='warning')
         # Check the result
         if result == 'yes':
-            self.controller.remove_flight(item_values[0])
+            self.handle_state(self.controller.remove_flight(item_values[0]))
             self.load_data_from_file()
+            
+    def handle_state(self, result: Result):
+        if not(result.is_success()):
+            messagebox.showerror("Error", result.error)
 
     def start(self):
         self.mainloop()

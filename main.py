@@ -1,6 +1,7 @@
 import tkinter as tk
 from ui.flight_frame import FlightWindow
 from ui.customer_frame import CustomerWindow
+from ui.booking_frame import BookingWindow
 
 class MainWindow(tk.Frame):
     def __init__(self, parent=None):
@@ -16,7 +17,8 @@ class MainWindow(tk.Frame):
         customer_button = tk.Button(self, text=f"Customer", command=lambda: [self.pack_forget(), customer_window.pack(fill=tk.BOTH, expand=True), customer_window.start()])
         customer_button.pack()
         
-        booking_button = tk.Button(self, text=f"Booking")
+        booking_window = BookingWindow(self.show)
+        booking_button = tk.Button(self, text=f"Booking", command=lambda: [self.pack_forget(), booking_window.pack(fill=tk.BOTH, expand=True), booking_window.start()])
         booking_button.pack()
 
     def start(self):

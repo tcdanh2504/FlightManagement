@@ -1,15 +1,16 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
-from controllers.customerController import CustomerController
-from models.customer import Customer
+from controllers.bookingController import BookingController
+from models.booking import Booking
+from datetime import datetime
 from utils.result import Result
 
-class CustomerWindow(tk.Frame):
+class BookingWindow(tk.Frame):
     
     def __init__(self, back_callback, parent=None):
         tk.Frame.__init__(self, parent)
         self.back_callback = back_callback
-        self.controller = CustomerController()
+        self.controller = BookingController()
         self.setup_ui()
         
     def setup_ui(self):
@@ -20,13 +21,13 @@ class CustomerWindow(tk.Frame):
         back_button = tk.Button(button_frame, text="Back", command=self.go_back)
         back_button.pack(side=tk.LEFT)
 
-        add_button = tk.Button(button_frame, text="Add customer", command=self.create_or_edit_customer)
+        add_button = tk.Button(button_frame, text="Add booking", command=self.create_or_edit_booking)
         add_button.pack(side=tk.LEFT)
         
-        edit_button = tk.Button(button_frame, text="Edit customer", command=self.edit)
+        edit_button = tk.Button(button_frame, text="Edit booking", command=self.edit)
         edit_button.pack(side=tk.LEFT)
         
-        delete_button = tk.Button(button_frame, text="Delete customer", command=self.delete)
+        delete_button = tk.Button(button_frame, text="Delete booking", command=self.delete)
         delete_button.pack(side=tk.LEFT)
 
         # Create a frame for the Treeview
@@ -38,12 +39,11 @@ class CustomerWindow(tk.Frame):
         self.grid_columnconfigure(0, weight=1)
 
         # Add a Treeview to the Treeview frame
-        self.tree = ttk.Treeview(tree_frame, columns=('Customer ID', 'Name', 'Phone', 'Email'), show='headings')
+        self.tree = ttk.Treeview(tree_frame, columns=('Booking ID', 'Flight ID', 'Customer ID', 'Booking time', 'Seat number'), show='headings')
 
         for col in self.tree["columns"]:
             self.tree.heading(col, text=col)
             self.tree.column(col, width=100)
-
         # Add a Scrollbar to the frame
         scrollbar = ttk.Scrollbar(tree_frame, orient="vertical", command=self.tree.yview)
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
@@ -53,43 +53,40 @@ class CustomerWindow(tk.Frame):
 
         # Configure the Treeview to use the Scrollbar
         self.tree.configure(yscrollcommand=scrollbar.set, xscrollcommand=scrollbarX.set)
-        
         self.load_data_from_file()
 
         self.tree.pack(fill=tk.BOTH, expand=True)
         
     def load_data_from_file(self):
-        data = self.controller.read_customers()
+        data = self.controller.read_bookings()
         for i in self.tree.get_children():
             self.tree.delete(i)
-        for customer in data:
-            self.tree.insert("", "end", values=(customer.customer_id, customer.name, customer.phone, customer.email))
+        for booking in data:
+            self.tree.insert("", "end", values=(booking.booking_id, booking.flight_id, booking.customer_id, booking.booking_time, booking.seat_number))
         
-    def create_or_edit_customer(self, customer=None):
-        # Create a new window
+    def create_or_edit_booking(self, booking=None):
         window = tk.Toplevel()
 
-        # Create labels and entry fields for each attribute of the Flight class
-        labels = ['Customer ID', 'Name', 'Phone', 'Email']
+        labels = ['Booking ID', 'Flight ID', 'Customer ID', 'Booking time', 'Seat number']
         entries = []
         for label in labels:
             row = tk.Frame(window)
             row.pack(side=tk.TOP, fill=tk.X, padx=5, pady=5)
             tk.Label(row, width=15, text=label, anchor='w').pack(side=tk.LEFT)
             entry = tk.Entry(row)
-            if customer is not None:
-                entry.insert(0, getattr(customer, label.replace(' ', '_').lower()))
+            if booking is not None:
+                entry.insert(0, getattr(booking, label.replace(' ', '_').lower()))
             entry.pack(side=tk.RIGHT, expand=tk.YES, fill=tk.X)
             entries.append(entry)
 
-        # Create a button that creates the Flight object and appends it to the CSV file
         def submit():
-            customer_id, name, phone, email = [entry.get() for entry in entries]
-            new_customer = Customer(customer_id, name, phone, email)
-            if customer is None:
-                self.handle_state(self.controller.append_customer(new_customer))
+            booking_id, flight_id, customer_id, booking_time, seat_number = [entry.get() for entry in entries]
+            booking_time = datetime.strptime(booking_time, "%Y-%m-%d %H:%M:%S")
+            new_booking = Booking(booking_id, flight_id, customer_id, booking_time, seat_number)
+            if booking is None:
+                self.handle_state(self.controller.append_booking(new_booking))
             else:
-                self.handle_state(self.controller.edit_customer(new_customer))
+                self.handle_state(self.controller.edit_booking(new_booking))
             self.load_data_from_file()
             window.destroy()
 
@@ -101,9 +98,10 @@ class CustomerWindow(tk.Frame):
         
         if len(item_values) == 0:
             return
-        customer_id, name, phone, email = item_values
-        customer = Customer(customer_id, name, phone, email)
-        self.create_or_edit_customer(customer)
+        booking_id, flight_id, customer_id, booking_time, seat_number = item_values
+        booking_time = datetime.strptime(booking_time, "%Y-%m-%d %H:%M:%S")
+        booking = Booking(booking_id, flight_id, customer_id, booking_time, seat_number)
+        self.create_or_edit_booking(booking)
     
     def delete(self):
         selected_row = self.tree.selection()
@@ -114,7 +112,7 @@ class CustomerWindow(tk.Frame):
         result = messagebox.askquestion("Delete", "Are you sure you want to delete this item?", icon='warning')
         # Check the result
         if result == 'yes':
-            self.handle_state(self.controller.remove_customer(item_values[0]))
+            self.handle_state(self.controller.remove_booking(item_values[0]))
             self.load_data_from_file()
             
     def handle_state(self, result: Result):

@@ -1,12 +1,13 @@
 import pandas as pd
 from typing import List
 from models.customer import Customer
+from utils.result import Result
 
 class CustomerController:
     def __init__(self):
         self.csv_file = "data/customers.csv"
 
-    def append_customer(self, customer: Customer) -> None:
+    def append_customer(self, customer: Customer) -> Result:
         customer_df = pd.DataFrame([vars(customer)])
         is_file_exist = True
 
@@ -17,10 +18,11 @@ class CustomerController:
             df = pd.DataFrame()
 
         if is_file_exist and df['customer_id'].isin([customer.customer_id]).any():
-            print(f"Customer ID {customer.customer_id} already exists.")
+            return Result(error=f"Customer ID {customer.customer_id} already exists.")
         else:
             df = df.append(customer_df, ignore_index=True)
             df.to_csv(self.csv_file, index=False)
+            return Result(data="Customer added successfully.")
 
     def read_customers(self) -> List[Customer]:
         try:
@@ -31,28 +33,27 @@ class CustomerController:
 
         return customers
 
-    def remove_customer(self, customer_id: str) -> None:
+    def remove_customer(self, customer_id: str) -> Result:
         try:
             df = pd.read_csv(self.csv_file)
         except FileNotFoundError:
-            print("File not found.")
-            return
+            return Result(error="File not found.")
 
         if not df['customer_id'].isin([customer_id]).any():
-            print(f"Customer ID {customer_id} does not exist.")
+            return Result(error=f"Customer ID {customer_id} does not exist.")
         else:
             df = df[df.customer_id != customer_id]
             df.to_csv(self.csv_file, index=False)
+            return Result(data="Customer removed successfully.")
 
-    def edit_customer(self, customer: Customer) -> None:
+    def edit_customer(self, customer: Customer) -> Result:
         try:
             df = pd.read_csv(self.csv_file)
         except FileNotFoundError:
-            print("File not found.")
-            return
+            return Result(error="File not found.")
 
         if not df['customer_id'].isin([customer.customer_id]).any():
-            print(f"Customer ID {customer.customer_id} does not exist.")
+            return Result(error=f"Customer ID {customer.customer_id} does not exist.")
         else:
             index = df[df['customer_id'] == customer.customer_id].index[0]
 
@@ -61,3 +62,4 @@ class CustomerController:
                     df.loc[index, key] = value
 
             df.to_csv(self.csv_file, index=False)
+            return Result(data="Customer edited successfully.")
