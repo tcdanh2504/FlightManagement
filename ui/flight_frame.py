@@ -1,9 +1,8 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 from controllers.fightController import FlightController
-from models.flight import Flight, FlightStatus
-from datetime import datetime, timedelta
-import random
+from models.flight import Flight
+from datetime import datetime
 
 class FlightWindow(tk.Frame):
     
@@ -11,7 +10,9 @@ class FlightWindow(tk.Frame):
         tk.Frame.__init__(self, parent)
         self.back_callback = back_callback
         self.controller = FlightController()
+        self.setup_ui()
         
+    def setup_ui(self):
         button_frame = tk.Frame(self)
         button_frame.grid(row=0, column=0, sticky='ew')
 
@@ -19,7 +20,7 @@ class FlightWindow(tk.Frame):
         back_button = tk.Button(button_frame, text="Back", command=self.go_back)
         back_button.pack(side=tk.LEFT)
 
-        add_button = tk.Button(button_frame, text="Add flight", command=self.create_flight)
+        add_button = tk.Button(button_frame, text="Add flight", command=self.create_or_edit_flight)
         add_button.pack(side=tk.LEFT)
         
         edit_button = tk.Button(button_frame, text="Edit flight", command=self.edit)
@@ -39,10 +40,8 @@ class FlightWindow(tk.Frame):
         # Add a Treeview to the Treeview frame
         self.tree = ttk.Treeview(tree_frame, columns=('Flight ID', 'Departure', 'Destination', 'Departure Time', 'Arrival Time', 'Seats', 'Available Seats', 'Airline', 'Flight Status', 'Price', 'Aircraft Type'), show='headings')
 
-        for col in ('Flight ID', 'Departure', 'Destination', 'Departure Time', 'Arrival Time', 'Seats', 'Available Seats', 'Airline', 'Flight Status', 'Price', 'Aircraft Type'):
-            self.tree.heading(col, text=col)
-
         for col in self.tree["columns"]:
+            self.tree.heading(col, text=col)
             self.tree.column(col, width=100)
         # Add a Scrollbar to the frame
         scrollbar = ttk.Scrollbar(tree_frame, orient="vertical", command=self.tree.yview)
@@ -63,45 +62,6 @@ class FlightWindow(tk.Frame):
             self.tree.delete(i)
         for flight in data:
             self.tree.insert("", "end", values=(flight.flight_id, flight.departure, flight.destination, flight.departure_time, flight.arrival_time, flight.seats, flight.available_seats, flight.airline, flight.flight_status, flight.price, flight.aircraft_type))
-            
-    def create_flight(self):
-        self.create_or_edit_flight()
-        # Create a new window
-        # window = tk.Toplevel()
-
-        # # Create labels and entry fields for each attribute of the Flight class
-        # labels = ['Flight ID', 'Departure', 'Destination', 'Departure Time', 'Arrival Time', 'Seats', 'Available Seats', 'Airline', 'Flight Status', 'Price', 'Aircraft Type']
-        # entries = []
-        # for label in labels:
-        #     row = tk.Frame(window)
-        #     row.pack(side=tk.TOP, fill=tk.X, padx=5, pady=5)
-        #     tk.Label(row, width=15, text=label, anchor='w').pack(side=tk.LEFT)
-        #     if label == 'Flight Status':
-        #         # Create a combobox for the flight status
-        #         flight_status = tk.StringVar()
-        #         combobox = ttk.Combobox(row, textvariable=flight_status)
-        #         combobox['values'] = ('On time', 'Delayed', 'Cancelled')
-        #         combobox.pack(side=tk.RIGHT, expand=tk.YES, fill=tk.X)
-        #         entries.append(flight_status)  # Append the StringVar, not the combobox
-        #     else:
-        #         entry = tk.Entry(row)
-        #         entry.pack(side=tk.RIGHT, expand=tk.YES, fill=tk.X)
-        #         entries.append(entry)
-
-        # # Create a button that creates the Flight object and appends it to the CSV file
-        # def submit():
-        #     flight_id, departure, destination, departure_time, arrival_time, seats, available_seats, airline, flight_status, price, aircraft_type = [entry.get() for entry in entries]
-        #     departure_time = datetime.strptime(departure_time, "%Y-%m-%d %H:%M:%S")
-        #     arrival_time = datetime.strptime(arrival_time, "%Y-%m-%d %H:%M:%S")
-        #     seats = int(seats)
-        #     available_seats = int(available_seats)
-        #     price = float(price)
-        #     flight = Flight(flight_id, departure, destination, departure_time, arrival_time, seats, available_seats, airline, flight_status, price, aircraft_type)
-        #     self.controller.append_flight(flight)
-        #     self.load_data_from_file()
-        #     window.destroy()
-
-        # tk.Button(window, text='Submit', command=submit).pack(side=tk.LEFT, padx=5, pady=5)
         
     def create_or_edit_flight(self, flight=None):
         # Create a new window
@@ -147,30 +107,6 @@ class FlightWindow(tk.Frame):
             window.destroy()
 
         tk.Button(window, text='Submit', command=submit).pack(side=tk.LEFT, padx=5, pady=5)
-    
-    # def add_new_flights(self):
-    #     airlines = ['Vietnam Airlines', 'Jetstar Pacific', 'Bamboo Airways', 'VietJet Air']
-    #     aircraft_types = ['Airbus A320', 'Boeing 737', 'Airbus A350', 'Boeing 787']
-    #     statuses = [ "On time", "Delayed", "Cancelled"]
-    #     locations = ['Hanoi', 'Ho Chi Minh City', 'Da Nang', 'Hai Phong', 'Can Tho', 'Nha Trang', 'Phu Quoc']
-
-    #     # Generate 100 flights
-    #     for i in range(1, 101):
-    #         flight_id = f'VN{i:03}'
-    #         departure, destination = random.sample(locations, 2)
-    #         departure_time = datetime.now() + timedelta(days=i)
-    #         arrival_time = departure_time + timedelta(hours=2)
-    #         seats = 200
-    #         available_seats = random.randint(0, 200)
-    #         airline = random.choice(airlines) 
-    #         flight_status = random.choice(statuses)  
-    #         price = random.randint(10, 50)* 100000
-    #         aircraft_type = random.choice(aircraft_types)  
-
-    #         # Create the Flight object
-    #         flight = Flight(flight_id, departure, destination, departure_time, arrival_time, seats, available_seats, airline, flight_status, price, aircraft_type)
-    #         self.controller.append_flight(flight)
-    #     self.load_data_from_file()
         
     def edit(self):
         selected_row = self.tree.selection()
