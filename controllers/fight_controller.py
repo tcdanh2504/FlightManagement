@@ -2,10 +2,11 @@ import pandas as pd
 from typing import List
 from models.flight import Flight
 from utils.result import Result
+from utils.constants import FLIGHT_CSV_FILE
 
 class FlightController:
     def __init__(self):
-        self.csv_file = "data/flights.csv"
+        self.csv_file = FLIGHT_CSV_FILE
 
     def append_flight(self, flight: Flight) -> Result:
         # Create a DataFrame from the flight object's attributes

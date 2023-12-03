@@ -2,10 +2,11 @@ import pandas as pd
 from typing import List
 from models.booking import Booking
 from utils.result import Result
+from utils.constants import BOOKING_CSV_FILE, FLIGHT_CSV_FILE, CUSTOMER_CSV_FILE
 
 class BookingController:
     def __init__(self):
-        self.csv_file = "data/bookings.csv"
+        self.csv_file = BOOKING_CSV_FILE
 
     def append_booking(self, booking: Booking) -> Result:
         booking_df = pd.DataFrame([vars(booking)])
@@ -18,8 +19,8 @@ class BookingController:
             df = pd.DataFrame()
 
         # Check if the flight_id and customer_id are valid
-        flight_df = pd.read_csv("data/flights.csv")
-        customer_df = pd.read_csv("data/customers.csv")
+        flight_df = pd.read_csv(FLIGHT_CSV_FILE)
+        customer_df = pd.read_csv(CUSTOMER_CSV_FILE)
         if not flight_df['flight_id'].isin([booking.flight_id]).any():
             return Result(error=f"Flight ID {booking.flight_id} does not exist.")
         elif not customer_df['customer_id'].isin([booking.customer_id]).any():

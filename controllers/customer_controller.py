@@ -2,10 +2,11 @@ import pandas as pd
 from typing import List
 from models.customer import Customer
 from utils.result import Result
+from utils.constants import CUSTOMER_CSV_FILE
 
 class CustomerController:
     def __init__(self):
-        self.csv_file = "data/customers.csv"
+        self.csv_file = CUSTOMER_CSV_FILE
 
     def append_customer(self, customer: Customer) -> Result:
         customer_df = pd.DataFrame([vars(customer)])

@@ -4,6 +4,7 @@ from utils.color import Color
 from ui.flight_frame import FlightWindow
 from ui.customer_frame import CustomerWindow
 from ui.booking_frame import BookingWindow
+from ui.analysis_frame import AnalysisWindow
 
 class MainWindow(tk.Frame):
     def __init__(self, parent=None):
@@ -31,7 +32,8 @@ class MainWindow(tk.Frame):
         booking_window = BookingWindow(self.show)
         booking_button = self.custom_button(root=button_frame,text="Bookings", command=lambda: [self.pack_forget(), booking_window.pack(fill=tk.BOTH, expand=True), booking_window.start()])
 
-        analysis_button = self.custom_button(root=button_frame,text="Analysis", command=lambda: [self.pack_forget(), booking_window.pack(fill=tk.BOTH, expand=True), booking_window.start()])
+        analysis_window = AnalysisWindow(self.show)
+        analysis_button = self.custom_button(root=button_frame,text="Analysis", command=lambda: [self.pack_forget(), analysis_window.pack(fill=tk.BOTH, expand=True), analysis_window.start()])
 
         flight_button.grid(row=0, column=0, sticky='nsew', padx=20, pady=20)
         customer_button.grid(row=0, column=1, sticky='nsew', padx=20, pady=20)
@@ -59,7 +61,7 @@ class MainWindow(tk.Frame):
         self.pack(fill=tk.BOTH, expand=True)
 
 root = tk.Tk()
-root.geometry("800x600")
+root.geometry("1000x700")
 main_window = MainWindow(root)
 main_window.pack(fill=tk.BOTH, expand=True)
 main_window.start()   

@@ -10,11 +10,11 @@ class CustomerWindow(tk.Frame):
     def __init__(self, back_callback, parent=None):
         tk.Frame.__init__(self, parent)
         self.back_callback = back_callback
-        self["bg"] = Color.PRIMARY.value
         self.controller = CustomerController()
         self.setup_ui()
         
     def setup_ui(self):
+        self["bg"] = Color.PRIMARY.value
         button_frame = tk.Frame(self)
         spacer = tk.Label(button_frame, height=1)  
         spacer["bg"] = Color.PRIMARY.value
@@ -36,13 +36,13 @@ class CustomerWindow(tk.Frame):
         back_button.pack(side=tk.LEFT, padx=10)
 
         add_button = custom_button(button_frame, text="Add customer", command=self.create_or_edit_customer)
-        add_button.pack(side=tk.LEFT, padx=10)
+        add_button.pack(side=tk.LEFT)
         
         edit_button = custom_button(button_frame, text="Edit customer", command=self.edit)
         edit_button.pack(side=tk.LEFT, padx=10)
         
         delete_button = custom_button(button_frame, text="Delete customer", command=self.delete)
-        delete_button.pack(side=tk.LEFT, padx=10)
+        delete_button.pack(side=tk.LEFT)
 
         # Create a frame for the Treeview
         tree_frame = tk.Frame(self)
