@@ -51,6 +51,25 @@ class CustomerWindow(tk.Frame):
         # Make the Treeview frame expandable
         self.grid_rowconfigure(1, weight=1)
         self.grid_columnconfigure(0, weight=1)
+        
+        def treeview_sort_column(tv, col, reverse):
+            l = [(tv.set(k, col), k) for k in tv.get_children('')]
+            try:
+                l = [(float(val), k) for val, k in l]
+            except ValueError:
+                pass
+
+            l.sort(reverse=reverse)
+
+            # rearrange items in sorted positions
+            for index, (val, k) in enumerate(l):
+                tv.move(k, '', index)
+
+            for i, item in enumerate(self.tree.get_children()):
+                tag = "evenrow" if i % 2 == 0 else "oddrow"
+                self.tree.item(item, tags=(tag,))
+            # reverse sort next time
+            tv.heading(col, command=lambda: treeview_sort_column(tv, col, not reverse))
 
         # Add a Treeview to the Treeview frame
         self.tree = ttk.Treeview(tree_frame, columns=('Customer ID', 'Name', 'Phone', 'Email'), show='headings')
@@ -58,7 +77,7 @@ class CustomerWindow(tk.Frame):
         self.tree.tag_configure("oddrow", background=Color.WHITE.value) 
 
         for col in self.tree["columns"]:
-            self.tree.heading(col, text=col)
+            self.tree.heading(col, text=col, command=lambda _col=col: treeview_sort_column(self.tree, _col, False))
             self.tree.column(col, width=100)
 
         # Add a Scrollbar to the frame
