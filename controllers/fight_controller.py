@@ -3,6 +3,7 @@ from typing import List
 from models.flight import Flight
 from utils.result import Result
 from utils.constants import FLIGHT_CSV_FILE
+import numpy as np
 
 class FlightController:
     def __init__(self):
@@ -32,7 +33,7 @@ class FlightController:
             df.to_csv(self.csv_file, index=False)
             return Result(data="Flight added successfully.")
 
-    def read_flights(self) -> List[Flight]:
+    def read_flights(self) -> np.ndarray:
         try:
             # Read the CSV file into a DataFrame
             df = pd.read_csv(self.csv_file)
@@ -40,9 +41,11 @@ class FlightController:
             df['arrival_time'] = pd.to_datetime(df['arrival_time'])
             # Convert the DataFrame to a list of Flight objects
             flights = [Flight(**flight) for flight in df.to_dict('records')]
+            # Convert the list of Flight objects to a NumPy array
+            flights = np.array(flights)
         except FileNotFoundError:
-            # If the file doesn't exist, return an empty list
-            flights = []
+            # If the file doesn't exist, return an empty NumPy array
+            flights = np.array([])
 
         return flights
     

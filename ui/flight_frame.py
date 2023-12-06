@@ -5,6 +5,8 @@ from controllers.fight_controller import FlightController
 from models.flight import Flight
 from datetime import datetime
 from utils.result import Result
+import numpy as np
+from tkcalendar import DateEntry
 
 class FlightWindow(tk.Frame):
     
@@ -12,6 +14,7 @@ class FlightWindow(tk.Frame):
         tk.Frame.__init__(self, parent)
         self.back_callback = back_callback
         self.controller = FlightController()
+        self.data = self.controller.read_flights()
         self.setup_ui()
         
     def setup_ui(self):
@@ -44,6 +47,35 @@ class FlightWindow(tk.Frame):
         
         delete_button = custom_button(button_frame, text="Delete flight", command=self.delete)
         delete_button.pack(side=tk.LEFT)
+        
+        start_departure = tk.Label(button_frame, text="Min Departure", font=("Arial", 12))
+        start_departure.pack(side=tk.LEFT, padx=10)
+        start_departure["fg"] = Color.WHITE.value
+        start_departure['bg'] = Color.PRIMARY.value
+        
+        start_date = DateEntry(button_frame, width=12, background='darkblue', foreground='white', borderwidth=2)
+        min_departure_time = np.min([flight.departure_time for flight in self.data])
+        start_date.pack(side=tk.LEFT)
+        start_date.set_date(min_departure_time)
+        
+        def date_change(event):
+            flights_mask = np.array([flight.departure_time.date() >= start_date.get_date() 
+                                           and flight.arrival_time.date() <= end_date.get_date() for flight in self.data])
+            self.load_data_to_table(self.data[flights_mask])
+            
+        start_date.bind("<<DateEntrySelected>>", date_change)
+        
+        end_arrival = tk.Label(button_frame, text="Max Arrival", font=("Arial", 12))
+        end_arrival.pack(side=tk.LEFT, padx=10)
+        end_arrival["fg"] = Color.WHITE.value
+        end_arrival['bg'] = Color.PRIMARY.value
+        
+        end_date = DateEntry(button_frame, width=12, background='darkblue', foreground='white', borderwidth=2)
+        max_arrival_time = np.max([flight.arrival_time for flight in self.data])
+        end_date.pack(side=tk.LEFT)
+        end_date.set_date(max_arrival_time)
+            
+        end_date.bind("<<DateEntrySelected>>", date_change)
 
         # Create a frame for the Treeview
         tree_frame = tk.Frame(self)
@@ -70,12 +102,11 @@ class FlightWindow(tk.Frame):
 
         # Configure the Treeview to use the Scrollbar
         self.tree.configure(yscrollcommand=scrollbar.set, xscrollcommand=scrollbarX.set)
-        self.load_data_from_file()
+        self.load_data_to_table(self.data)
 
         self.tree.pack(fill=tk.BOTH, expand=True)
         
-    def load_data_from_file(self):
-        data = self.controller.read_flights()
+    def load_data_to_table(self, data):
         for i in self.tree.get_children():
             self.tree.delete(i)
         for flight in data:
