@@ -175,7 +175,8 @@ class FlightWindow(tk.Frame):
                 self.handle_state(self.controller.append_flight(new_flight))
             else:
                 self.handle_state(self.controller.edit_flight(new_flight))
-            self.load_data_from_file()
+            self.data = self.controller.read_flights()
+            self.load_data_to_table(self.data)
             window.destroy()
 
         tk.Button(window, text='Submit', command=submit).pack(side=tk.LEFT, padx=5, pady=5)
