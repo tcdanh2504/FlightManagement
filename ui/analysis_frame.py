@@ -5,8 +5,7 @@ from controllers.analysis_controller import AnalysisController
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import pandas as pd
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-import numpy as np
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 
 class AnalysisWindow(tk.Frame):
     
@@ -71,6 +70,8 @@ class AnalysisWindow(tk.Frame):
         ax.set_title('Flight Status Distribution')
 
         canvas = FigureCanvasTkAgg(fig, master=tab)
+        tool_bar = NavigationToolbar2Tk(canvas, tab, pack_toolbar=False)
+        tool_bar.grid(sticky='new')
         canvas.draw()
         canvas.get_tk_widget().grid(sticky='nsew')
         
@@ -94,6 +95,8 @@ class AnalysisWindow(tk.Frame):
         ax.set_xticklabels(ax.get_xticklabels(), rotation=0, horizontalalignment='center')
 
         canvas = FigureCanvasTkAgg(fig, master=tab)
+        tool_bar = NavigationToolbar2Tk(canvas, tab, pack_toolbar=False)
+        tool_bar.grid(sticky='new')
         canvas.draw()
         canvas.get_tk_widget().grid(sticky='nsew')
         
@@ -115,6 +118,8 @@ class AnalysisWindow(tk.Frame):
         ax.set_ylabel('Number of Flights')
 
         canvas = FigureCanvasTkAgg(fig, master=tab)
+        tool_bar = NavigationToolbar2Tk(canvas, tab, pack_toolbar=False)
+        tool_bar.grid(sticky='new')
         canvas.draw()
         canvas.get_tk_widget().grid(sticky='nsew')
         
@@ -138,6 +143,8 @@ class AnalysisWindow(tk.Frame):
         ax.set_ylabel('Number of Bookings')
 
         canvas = FigureCanvasTkAgg(fig, master=tab)
+        tool_bar = NavigationToolbar2Tk(canvas, tab, pack_toolbar=False)
+        tool_bar.grid(sticky='new')
         canvas.draw()
         canvas.get_tk_widget().grid(sticky='nsew')
         
@@ -163,6 +170,8 @@ class AnalysisWindow(tk.Frame):
         ax.set_xticklabels(ax.get_xticklabels(), rotation=0, horizontalalignment='center')
 
         canvas = FigureCanvasTkAgg(fig, master=tab)
+        tool_bar = NavigationToolbar2Tk(canvas, tab, pack_toolbar=False)
+        tool_bar.grid(sticky='new')
         canvas.draw()
         canvas.get_tk_widget().grid(sticky='nsew')
     
